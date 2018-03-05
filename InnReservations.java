@@ -49,19 +49,19 @@ Rate, LastName, FirstName, Adults, Kids FROM INN.reservations;
 
 -- Shell init:
 export CLASSPATH=$CLASSPATH:mysql-connector-java-5.1.44-bin.jar:.
-export HP_JDBC_URL=jdbc:mysql://<hostname>/<database name>?autoReconnect=true\&useSSL=false
-export HP_JDBC_USER=...
-export HP_JDBC_PW=...
+export IR_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/qnngo?autoReconnect=true\&useSSL=false
+export IR_JDBC_USER=qnngo
+export IR_JDBC_PW=...
  */
 
 public class InnReservations {
     public static void main(String[] args) {
-	try {
-	    InnReservations ir = new InnReservations();
-	    ir.demo1();
-	} catch (SQLException e) {
-	    System.err.println("SQLException: " + e.getMessage());
-	}
+        try {
+            InnReservations ir = new InnReservations();
+            ir.demo1();
+        } catch (SQLException e) {
+            System.err.println("SQLException: " + e.getMessage());
+        }
     }
 
     // Demo1 - Establish JDBC connection, execute DDL statement
@@ -69,7 +69,7 @@ public class InnReservations {
 
 	// Step 0: Load MySQL JDBC Driver
 	// No longer required as of JDBC 2.0  / Java 6
-	try{
+	try {
 	    Class.forName("com.mysql.jdbc.Driver");
 	    System.out.println("MySQL JDBC Driver loaded");
 	} catch (ClassNotFoundException ex) {
@@ -78,9 +78,9 @@ public class InnReservations {
 	}
 
 	// Step 1: Establish connection to RDBMS
-	try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
-							   System.getenv("HP_JDBC_USER"),
-							   System.getenv("HP_JDBC_PW"))) {
+	try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
+							   System.getenv("IR_JDBC_USER"),
+							   System.getenv("IR_JDBC_PW"))) {
 	    // Step 2: Construct SQL statement
 	    String sql = "ALTER TABLE hp_goods ADD COLUMN AvailUntil DATE";
 
@@ -105,9 +105,9 @@ public class InnReservations {
     private void demo2() throws SQLException {
 
 	// Step 1: Establish connection to RDBMS
-	try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
-							   System.getenv("HP_JDBC_USER"),
-							   System.getenv("HP_JDBC_PW"))) {
+	try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
+							   System.getenv("IR_JDBC_USER"),
+							   System.getenv("IR_JDBC_PW"))) {
 	    // Step 2: Construct SQL statement
 	    String sql = "SELECT * FROM hp_goods";
 
@@ -139,9 +139,9 @@ public class InnReservations {
     private void demo3() throws SQLException {
 
 	// Step 1: Establish connection to RDBMS
-	try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
-							   System.getenv("HP_JDBC_USER"),
-							   System.getenv("HP_JDBC_PW"))) {
+	try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
+							   System.getenv("IR_JDBC_USER"),
+							   System.getenv("IR_JDBC_PW"))) {
 	    // Step 2: Construct SQL statement
 	    Scanner scanner = new Scanner(System.in);
 	    System.out.print("Enter a flavor: ");
@@ -177,9 +177,9 @@ public class InnReservations {
     private void demo4() throws SQLException {
 
 	// Step 1: Establish connection to RDBMS
-	try (Connection conn = DriverManager.getConnection(System.getenv("HP_JDBC_URL"),
-							   System.getenv("HP_JDBC_USER"),
-							   System.getenv("HP_JDBC_PW"))) {
+	try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
+							   System.getenv("IR_JDBC_USER"),
+							   System.getenv("IR_JDBC_PW"))) {
 	    // Step 2: Construct SQL statement
 	    Scanner scanner = new Scanner(System.in);
 	    System.out.print("Enter a flavor: ");
