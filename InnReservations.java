@@ -12,50 +12,45 @@ export IR_JDBC_PW=...
  */
 
 public class InnReservations {
+
     public static void main(String[] args) {
         try {
 			Scanner sc = new Scanner(System.in);
-			System.out.print("Reservation Info or Revenue or Quit: ");
+			System.out.print("What would you like to do?\n" + 
+							"Look at rooms and rates (RNR)\n" + 
+							"Make a reservation (RES)\n" + 
+							"Look at reservation information (RESI)\n" + 
+							"View revenue (REV)\n" +
+							"Quit the program (QUIT):");
 			InnReservations innRes = new InnReservations();
 			
-			while (!(sc.hasNext("Quit"))) {
+			while (!(sc.hasNext("QUIT"))) {
 				String input = sc.nextLine();
-				input = input.toLowerCase();
 				System.out.println("");
 
-				if (input.equals("reservation info")) {
+				if (input.equals("RESI")) {
 					innRes.reservationInfo();
-				} else if (input.equals("revenue")) {
+				} else if (input.equals("REV")) {
 					innRes.revenue();
+				} else if (input.equals("RNR")) {
+					innRes.roomsAndRates();
+				} else if (input.equals("RES")) {
+					innRes.run(); 
 				}
 
-				System.out.print("Reservation Info or Revenue or Quit: ");
+				System.out.print("What would you like to do?\n" + 
+							"Look at rooms and rates (RNR)\n" + 
+							"Make a reservation (RES)\n" + 
+							"Look at reservation information (RESI)\n" + 
+							"View revenue (REV)\n" +
+							"Quit the program (QUIT):");
 			}
 			
 		} catch (SQLException e) {
 			System.err.println("SQLException: " + e.getMessage());
 		}
     }
-
-   private void run() throws SQLException {
-      String input = "";
-      Scanner scanner = new Scanner(System.in);
-      System.out.println("Select an option: \n Rooms and Rates \n Reservations \n Quit");
-      while(!input.equals("Quit")) {
-         input = scanner.nextLine();
-         switch(input) {
-            case "Rooms and Rates":
-                  roomsAndRates();
-               break;
-            case "Reservations":
-               //reservations();
-               break;
-            default:
-               System.out.println("Input not recognized");
-         }
-      }
-      // loop inputs for the basic 4
-   }
+	
    private void roomsAndRates() throws SQLException{
      String bigSelect = "select tmp1.Popularity, tmp1.Room, tmp2.Next_Avail, " +
                      "tmp3.Last_CheckOut, tmp3.Last_Stay from (select round(sum(" +
