@@ -12,6 +12,7 @@ export IR_JDBC_PW=...
  */
 
 public class InnReservations {
+
     public static void main(String[] args) {
         try {
 			Scanner sc = new Scanner(System.in);
@@ -33,9 +34,15 @@ public class InnReservations {
 					innRes.revenue();
 				} else if (input.equals("RNR")) {
 					innRes.roomsAndRates();
+<<<<<<< HEAD
 				} else if (input.equals("RES")) {
 					innRes.run(); 
 				}
+=======
+				} /*else if (input.equals("RES")) {
+					innRes.reservations(); 
+				}*/
+>>>>>>> 16f085fda7405dc5fdf1d0230ee79b6cca2810c9
 
 				System.out.print("What would you like to do?\n" + 
 							"Look at rooms and rates (RNR)\n" + 
@@ -49,26 +56,7 @@ public class InnReservations {
 			System.err.println("SQLException: " + e.getMessage());
 		}
     }
-
-   private void run() throws SQLException {
-      String input = "";
-      Scanner scanner = new Scanner(System.in);
-      System.out.println("Select an option: \n Rooms and Rates \n Reservations \n Quit");
-      while(!input.equals("Quit")) {
-         input = scanner.nextLine();
-         switch(input) {
-            case "Rooms and Rates":
-                  roomsAndRates();
-               break;
-            case "Reservations":
-               //reservations();
-               break;
-            default:
-               System.out.println("Input not recognized");
-         }
-      }
-      // loop inputs for the basic 4
-   }
+	
    private void roomsAndRates() throws SQLException{
      String bigSelect = "select tmp1.Popularity, tmp1.Room, tmp2.Next_Avail, " +
                      "tmp3.Last_CheckOut, tmp3.Last_Stay from (select round(sum(" +
