@@ -9,19 +9,27 @@ export CLASSPATH=$CLASSPATH:mysql-connector-java-5.1.44-bin.jar:.
 export IR_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/qnngo?autoReconnect=true\&useSSL=false
 export IR_JDBC_USER=qnngo
 export IR_JDBC_PW=...
+
+export CLASSPATH=$CLASSPATH:mysql-connector-java-5.1.45-bin.jar:.ls
+export LAB6_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/acheng21?autoReconnect=true\&useSSL=false
+export LAB6_JDBC_USER=acheng21
+export LAB6_JDBC_PW=365W18_011282748
  */
 
 public class InnReservations {
 
+	static final int FN = 0, LN = 1, D1 = 2, D2 = 3, RMC = 4, RSC = 5;
+
     public static void main(String[] args) {
         try {
 			Scanner sc = new Scanner(System.in);
-			System.out.print("What would you like to do?\n" + 
+			System.out.print("What would you like to do:\n" + 
 							"Look at rooms and rates (RNR)\n" + 
 							"Make a reservation (RES)\n" + 
 							"Look at reservation information (RESI)\n" + 
 							"View revenue (REV)\n" +
-							"Quit the program (QUIT):");
+							"Quit the program (QUIT)?\n" +
+							"Enter here: ");
 			InnReservations innRes = new InnReservations();
 			
 			while (!(sc.hasNext("QUIT"))) {
@@ -38,12 +46,13 @@ public class InnReservations {
 					innRes.reservations(); 
 				}*/
 
-				System.out.print("What would you like to do?\n" + 
+				System.out.print("What would you like to do:\n" + 
 							"Look at rooms and rates (RNR)\n" + 
 							"Make a reservation (RES)\n" + 
 							"Look at reservation information (RESI)\n" + 
 							"View revenue (REV)\n" +
-							"Quit the program (QUIT):");
+							"Quit the program (QUIT)?\n" +
+							"Enter here: ");
 			}
 			
 		} catch (SQLException e) {
@@ -91,9 +100,9 @@ public class InnReservations {
                String room = rs.getString("Room");
                float pop = rs.getFloat("Popularity");
 
-               Date nextAvail = rs.getDate("Next_Avail");
+               java.util.Date nextAvail = rs.getDate("Next_Avail");
                String nextAvailS = df.format(nextAvail);
-               Date lastCheckout = rs.getDate("Last_CheckOut");
+               java.util.Date lastCheckout = rs.getDate("Last_CheckOut");
                String lastCheckoutS = df.format(lastCheckout);
 
                int lastStay = rs.getInt("Last_Stay");
