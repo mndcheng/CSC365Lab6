@@ -15,21 +15,34 @@ public class InnReservations {
     public static void main(String[] args) {
         try {
 			Scanner sc = new Scanner(System.in);
-			System.out.print("Reservation Info or Revenue or Quit: ");
+			System.out.print("What would you like to do?\n" + 
+							"Look at rooms and rates (RNR)\n" + 
+							"Make a reservation (RES)\n" + 
+							"Look at reservation information (RESI)\n" + 
+							"View revenue (REV)\n" +
+							"Quit the program (QUIT):");
 			InnReservations innRes = new InnReservations();
 			
-			while (!(sc.hasNext("Quit"))) {
+			while (!(sc.hasNext("QUIT"))) {
 				String input = sc.nextLine();
-				input = input.toLowerCase();
 				System.out.println("");
 
-				if (input.equals("reservation info")) {
+				if (input.equals("RESI")) {
 					innRes.reservationInfo();
-				} else if (input.equals("revenue")) {
+				} else if (input.equals("REV")) {
 					innRes.revenue();
+				} else if (input.equals("RNR")) {
+					innRes.roomsAndRates();
+				} else if (input.equals("RES")) {
+					innRes.run(); 
 				}
 
-				System.out.print("Reservation Info or Revenue or Quit: ");
+				System.out.print("What would you like to do?\n" + 
+							"Look at rooms and rates (RNR)\n" + 
+							"Make a reservation (RES)\n" + 
+							"Look at reservation information (RESI)\n" + 
+							"View revenue (REV)\n" +
+							"Quit the program (QUIT):");
 			}
 			
 		} catch (SQLException e) {
@@ -105,72 +118,6 @@ public class InnReservations {
          }
       }      
    }
-   // Demo2 - Establish JDBC connection, execute SELECT query, read & print result
-   private void demo2() throws SQLException {
-
-        // Step 1: Establish connection to RDBMS
-        try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
-                                System.getenv("IR_JDBC_USER"),
-                                System.getenv("IR_JDBC_PW"))) {
-            // Step 2: Construct SQL statement
-            String sql = "SELECT * FROM lab6_reservations";
-
-            // Step 3: (omitted in this example) Start transaction
-
-            // Step 4: Send SQL statement to DBMS
-            try (Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql)) {
-
-            // Step 5: Receive results
-            while (rs.next()) {
-                String flavor = rs.getString("Room");
-                System.out.format("%s ", flavor);
-            }
-            }
-
-            // Step 6: (omitted in this example) Commit or rollback transaction
-        }
-        // Step 7: Close connection (handled by try-with-resources syntax)
-    }
-
-    // Demo4 - Establish JDBC connection, execute DML query (UPDATE) using PreparedStatement / transaction    
-    private void demo4() throws SQLException {
-
-        // Step 1: Establish connection to RDBMS
-        try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
-                                System.getenv("IR_JDBC_USER"),
-                                System.getenv("IR_JDBC_PW"))) {
-            // Step 2: Construct SQL statement
-            Scanner scanner = new Scanner(System.in);
-            System.out.print("Enter a flavor: ");
-            String flavor = scanner.next();
-            System.out.format("Until what date will %s be available (YYYY-MM-DD)? ", flavor);
-            LocalDate availDt = LocalDate.parse(scanner.next());
-            
-            String updateSql = "UPDATE hp_goods SET AvailUntil = ? WHERE Flavor = ?";
-
-            // Step 3: Start transaction
-            conn.setAutoCommit(false);
-            
-            try (PreparedStatement pstmt = conn.prepareStatement(updateSql)) {
-            
-            // Step 4: Send SQL statement to DBMS
-            pstmt.setDate(1, java.sql.Date.valueOf(availDt));
-            pstmt.setString(2, flavor);
-            int rowCount = pstmt.executeUpdate();
-            
-            // Step 5: Handle results
-            System.out.format("Updated %d records for %s pastries%n", rowCount, flavor);
-
-            // Step 6: Commit or rollback transaction
-            conn.commit();
-            } catch (SQLException e) {
-            conn.rollback();
-            }
-
-        }
-        // Step 7: Close connection (handled implcitly by try-with-resources syntax)
-    }
     
     // Detailed Reservation Information   
     private void reservationInfo() throws SQLException {
