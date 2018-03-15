@@ -34,9 +34,9 @@ public class InnReservations {
 					innRes.revenue();
 				} else if (input.equals("RNR")) {
 					innRes.roomsAndRates();
-				} else if (input.equals("RES")) {
-					innRes.run(); 
-				}
+				} /*else if (input.equals("RES")) {
+					innRes.reservations(); 
+				}*/
 
 				System.out.print("What would you like to do?\n" + 
 							"Look at rooms and rates (RNR)\n" + 
