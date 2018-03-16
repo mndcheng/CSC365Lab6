@@ -2,6 +2,7 @@ import java.time.LocalDate;
 import java.util.*;
 import java.sql.*;
 import java.text.*;
+import java.time.*;
 
 /*
 -- Shell init:
@@ -42,9 +43,9 @@ public class InnReservations {
 					innRes.revenue();
 				} else if (input.equals("RNR")) {
 					innRes.roomsAndRates();
-				} /*else if (input.equals("RES")) {
+				} else if (input.equals("RES")) {
 					innRes.reservations(); 
-				}*/
+				}
 
 				System.out.print("What would you like to do:\n" + 
 							"Look at rooms and rates (RNR)\n" + 
@@ -203,6 +204,7 @@ public class InnReservations {
             }
          }
       }
+   }
 private void printReservation(Reservation res, float total) {
     System.out.printf("Room Code: %s\n", res.getRoomCode());
     System.out.printf("Room Name: %s\n", res.getRoomName());
@@ -646,7 +648,4 @@ private float calcCost(float rate, String checkIn, String checkOut) {
       public int getNumChildren() {return this.numChildren;}
       public float getRate() {return this.rate;}
    }
-}
-
-
 }
