@@ -7,14 +7,14 @@ import java.time.*;
 /*
 -- Shell init:
 export CLASSPATH=$CLASSPATH:mysql-connector-java-5.1.44-bin.jar:.
-export IR_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/qnngo?autoReconnect=true\&useSSL=false
-export IR_JDBC_USER=qnngo
-export IR_JDBC_PW=...
+export LAB6_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/qnngo?autoReconnect=true\&useSSL=false
+export LAB6_JDBC_USER=qnngo
+export LAB6_JDBC_PW=...
 
 export CLASSPATH=$CLASSPATH:mysql-connector-java-5.1.45-bin.jar:.ls
-export IR_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/acheng21?autoReconnect=true\&useSSL=false
-export IR_JDBC_USER=acheng21
-export IR_JDBC_PW=365W18_011282748
+export LAB6_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/acheng21?autoReconnect=true\&useSSL=false
+export LAB6_JDBC_USER=acheng21
+export LAB6_JDBC_PW=365W18_011282748
  */
 
 public class InnReservations {
@@ -90,9 +90,9 @@ public class InnReservations {
                      "GROUP BY Room) " +
                      ") tmp3 ON tmp2.Room = tmp3.Room;";
       DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-      try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
-                                System.getenv("IR_JDBC_USER"),
-                                System.getenv("IR_JDBC_PW"))) {
+      try (Connection conn = DriverManager.getConnection(System.getenv("LAB6_JDBC_URL"),
+                                System.getenv("LAB6_JDBC_USER"),
+                                System.getenv("LAB6_JDBC_PW"))) {
          try(Statement stmt = conn.createStatement();
          ResultSet rs = stmt.executeQuery(bigSelect)) {
             System.out.format("%-10s %-10s %-15s %-15s %-15s\n", "Room", "Popularity", "Next Avail",
@@ -187,9 +187,9 @@ public class InnReservations {
          String confirm = scan.nextLine();
 
          if(confirm.equals("confirm")) {
-            try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
-                                   System.getenv("IR_JDBC_USER"),
-                                   System.getenv("IR_JDBC_PW"))) {
+            try (Connection conn = DriverManager.getConnection(System.getenv("LAB6_JDBC_URL"),
+                                   System.getenv("LAB6_JDBC_USER"),
+                                   System.getenv("LAB6_JDBC_PW"))) {
                try(PreparedStatement ps = conn.prepareStatement(insert)) {
                   ps.setInt(counter++, ); // NEEDS A UNIQUE ID
                   ps.setString(counter++, res.getRoomCode());
@@ -255,9 +255,9 @@ public class InnReservations {
                         "where CheckIn between ? " +
                         "and ? OR CheckOut " +
                         "between ? and ?);";
-      try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
-                                System.getenv("IR_JDBC_USER"),
-                                System.getenv("IR_JDBC_PW"))) {
+      try (Connection conn = DriverManager.getConnection(System.getenv("LAB6_JDBC_URL"),
+                                System.getenv("LAB6_JDBC_USER"),
+                                System.getenv("LAB6_JDBC_PW"))) {
          try(PreparedStatement ps = conn.prepareStatement(sqlSelect)) {
             if(!roomCode.equals("any")) {
                ps.setString(counter++, roomCode);
@@ -294,9 +294,9 @@ public class InnReservations {
     private void reservationInfo() throws SQLException {
 
 		// Step 1: Establish connection to RDBMS
-		try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
-									System.getenv("IR_JDBC_USER"),
-									System.getenv("IR_JDBC_PW"))) {
+		try (Connection conn = DriverManager.getConnection(System.getenv("LAB6_JDBC_URL"),
+									System.getenv("LAB6_JDBC_USER"),
+									System.getenv("LAB6_JDBC_PW"))) {
 			// Step 2: Construct SQL statement
 			Search s = getSearch(); 
 			String selectSql = "SELECT CODE, Room, RoomName, CheckIn, " +
@@ -395,9 +395,9 @@ public class InnReservations {
     private void revenue() throws SQLException {
 
 		// Step 1: Establish connection to RDBMS
-		try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
-									System.getenv("IR_JDBC_USER"),
-									System.getenv("IR_JDBC_PW"))) {
+		try (Connection conn = DriverManager.getConnection(System.getenv("LAB6_JDBC_URL"),
+									System.getenv("LAB6_JDBC_USER"),
+									System.getenv("LAB6_JDBC_PW"))) {
 			// Step 2: Construct SQL statement
 
 			String dropTable = "DROP VIEW IF EXISTS Revenue;";
