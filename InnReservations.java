@@ -7,9 +7,15 @@ import java.time.*;
 /*
 -- Shell init:
 export CLASSPATH=$CLASSPATH:mysql-connector-java-5.1.44-bin.jar:.
+<<<<<<< HEAD
+export IR_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/qnngo?autoReconnect=true\&useSSL=false
+export IR_JDBC_USER=qnngo
+export IR_JDBC_PW=
+=======
 export LAB6_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/qnngo?autoReconnect=true\&useSSL=false
 export LAB6_JDBC_USER=qnngo
 export LAB6_JDBC_PW=...
+>>>>>>> 13b5e4661bc34d48927824b89d2e85e81efd98cb
 
 export CLASSPATH=$CLASSPATH:mysql-connector-java-5.1.45-bin.jar:.ls
 export LAB6_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/acheng21?autoReconnect=true\&useSSL=false
@@ -156,24 +162,25 @@ public class InnReservations {
                            String checkIn, String checkOut,
                            int numChildren, int numAdults) throws SQLException {
 
-      List<Reservation> exactMatches = exactSuggestions(roomCode, bedType, checkIn,
+      List<Reservation> matches = exactSuggestions(roomCode, bedType, checkIn,
                                                 checkOut, numChildren, numAdults);
       Reservation res;
 
       Scanner scan = new Scanner(System.in);
-
-      String insert = "Insert Into lab6_reservations ?, ?, ?, ?, ?, ?, ?, ?";
-      if(exactMatches.size() > 0) {
+      String maxCode = "Select max(code) as Code from lab6_reservations";
+      int maxCd = 99999;
+      String insert = "Insert Into lab6_reservations (CODE, Room, CheckIn, Checkout, Rate, LastName, FirstName, Adults, Kids) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+      if(matches.size() > 0) {
          int i = 1, counter = 1;
          System.out.println("Exact Matches Found: ");
-         for(Reservation r : exactMatches) {
+         for(Reservation r : matches) {
             System.out.printf("%-3d %s\n", i++, r.getRoomCode());
          }
 
          System.out.println("Select a number: ");
          String resp = scan.nextLine();
          int selection = Integer.parseInt(resp);
-         res = exactMatches.get(selection - 1);
+         res = matches.get(selection - 1);
 
          float total = calcCost(res.getRate(), checkIn, checkOut);
 
@@ -190,8 +197,17 @@ public class InnReservations {
             try (Connection conn = DriverManager.getConnection(System.getenv("LAB6_JDBC_URL"),
                                    System.getenv("LAB6_JDBC_USER"),
                                    System.getenv("LAB6_JDBC_PW"))) {
+<<<<<<< HEAD
+               try(Statement st = conn.createStatement();
+                  ResultSet rs = st.executeQuery(maxCode)) {
+                  while(rs.next()) {
+                     maxCd = rs.getInt("Code");
+                  }
+               }
+=======
+>>>>>>> 13b5e4661bc34d48927824b89d2e85e81efd98cb
                try(PreparedStatement ps = conn.prepareStatement(insert)) {
-                  ps.setInt(counter++, ); // NEEDS A UNIQUE ID
+                  ps.setInt(counter++, (maxCd + 1)); // NEEDS A UNIQUE ID
                   ps.setString(counter++, res.getRoomCode());
                   ps.setString(counter++, res.getCheckIn());
                   ps.setString(counter++, res.getCheckOut());
@@ -200,14 +216,64 @@ public class InnReservations {
                   ps.setString(counter++, firstName);
                   ps.setInt(counter++, res.getNumAdults());
                   ps.setInt(counter++, res.getNumChildren());
+                  int j = ps.executeUpdate();
+                  System.out.printf("%d row has been added\n", j);
                }
             }
          }
       }
       else {
+         int i = 1, counter = 1;
+         System.out.println("No exact matches found here are some other suggestions");
+         matches = approxSuggestions(roomCode, bedType, checkIn, checkOut, numChildren, numAdults);
+         for(Reservation r : matches) {
+            System.out.printf("%-3d %s\n", i++, r.getRoomCode());
+         }
+         System.out.println("Select a number: ");
+         String resp = scan.nextLine();
+         int selection = Integer.parseInt(resp);
+         res = matches.get(selection - 1);
+
+         float total = calcCost(res.getRate(), checkIn, checkOut);
+
+         System.out.println("Reservation Info:");
+         System.out.printf("First Name: %s\n", firstName);
+         System.out.printf("Last Name: %s\n", lastName);
+
+         printReservation(res, total);
          
+         
+         System.out.println("confirm or cancel");
+         String confirm = scan.nextLine();
+
+         if(confirm.equals("confirm")) {
+            try (Connection conn = DriverManager.getConnection(System.getenv("LAB6_JDBC_URL"),
+                                   System.getenv("LAB6_JDBC_USER"),
+                                   System.getenv("LAB6_JDBC_PW"))) {
+               try(Statement st = conn.createStatement();
+                  ResultSet rs = st.executeQuery(maxCode)) {
+                  while(rs.next()) {
+                     maxCd = rs.getInt("Code");
+                  }
+               }
+               try(PreparedStatement ps = conn.prepareStatement(insert)) {
+                  ps.setInt(counter++, maxCd + 1); // NEEDS A UNIQUE ID
+                  ps.setString(counter++, res.getRoomCode());
+                  ps.setString(counter++, res.getCheckIn());
+                  ps.setString(counter++, res.getCheckOut());
+                  ps.setFloat(counter++, total);
+                  ps.setString(counter++, lastName);
+                  ps.setString(counter++, firstName);
+                  ps.setInt(counter++, res.getNumAdults());
+                  ps.setInt(counter++, res.getNumChildren());
+                  int j = ps.executeUpdate();
+                  System.out.printf("%d row has been added\n", j);
+               }
+            }
+         }
       }
    }
+
    private void printReservation(Reservation res, float total) {
       System.out.printf("Room Code: %s\n", res.getRoomCode());
       System.out.printf("Room Name: %s\n", res.getRoomName());
@@ -234,6 +300,115 @@ public class InnReservations {
       return (float)(rate*numWeekdays) + (float)(rate*1.1*numWeekends);
    }
       
+   private List<Reservation> approxSuggestions(String roomCode, String bedType, 
+                           String checkIn, String checkOut, int numChildren, 
+                           int numAdults) throws SQLException {
+
+      List<Reservation> ls = new ArrayList<Reservation>();
+      String selectDecor = "Select Decor from lab6_rooms where RoomCode = ?";
+      String targetDecor = "garbage";
+
+      String approxSelect = "Select RoomCode, RoomName, BedType, BasePrice,  ? as CheckIn, ? as CheckOut from lab6_rooms where ";
+      approxSelect = approxSelect + "Decor = ? and ";
+      approxSelect = approxSelect + "bedType = ? and ";
+
+      approxSelect = approxSelect + "maxOcc >= ? AND " +
+                        "RoomCode NOT IN (Select Room from lab6_reservations " +
+                        "where CheckIn between ? " +
+                        "and ? OR CheckOut " +
+                        "between ? and ?)";
+
+      approxSelect = approxSelect + " UNION ";
+
+      approxSelect = approxSelect + "Select RoomCode, RoomName, BedType, BasePrice,  ? as CheckIn, ? as CheckOut from lab6_rooms where ";
+      approxSelect = approxSelect + "bedType = ? and ";
+
+      approxSelect = approxSelect + "maxOcc >= ? AND " +
+                        "RoomCode NOT IN (Select Room from lab6_reservations " +
+                        "where CheckIn between ? " +
+                        "and ? OR CheckOut " +
+                        "between ? and ?)";
+
+      approxSelect = approxSelect + " UNION ";
+
+      approxSelect = approxSelect + "Select RoomCode, RoomName, BedType, BasePrice,  ? as CheckIn, ? as CheckOut from lab6_rooms where ";
+
+      approxSelect = approxSelect + "maxOcc >= ? AND " +
+                        "RoomCode NOT IN (Select Room from lab6_reservations " +
+                        "where CheckIn between ? " +
+                        "and ? OR CheckOut " +
+                        "between ? and ?)";
+
+      approxSelect = approxSelect + " LIMIT 5";
+      
+      int counter = 1;
+
+      try (Connection conn = DriverManager.getConnection(System.getenv("LAB6_JDBC_URL"),
+                                System.getenv("LAB6_JDBC_USER"),
+                                System.getenv("LAB6_JDBC_PW"))) {
+         try(PreparedStatement ps = conn.prepareStatement(selectDecor)) {
+            ps.setString(1, roomCode);
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+               targetDecor = rs.getString("Decor");
+            }
+         }
+         try(PreparedStatement ps = conn.prepareStatement(approxSelect)) {
+            int totalPeople = numChildren + numAdults;
+            //Query 1 - match decor, bedtype and dates
+            ps.setString(counter++, checkIn);
+            ps.setString(counter++, checkOut);
+
+            ps.setString(counter++, targetDecor);
+            ps.setString(counter++, bedType);
+            ps.setInt(counter++, totalPeople);
+
+            ps.setString(counter++, checkIn);
+            ps.setString(counter++, checkOut);
+
+            ps.setString(counter++, checkIn);
+            ps.setString(counter++, checkOut);
+            
+            //Query 2 - match bedtype and dates
+            ps.setString(counter++, checkIn);
+            ps.setString(counter++, checkOut);
+
+            ps.setString(counter++, bedType);
+            ps.setInt(counter++, totalPeople);
+
+            ps.setString(counter++, checkIn);
+            ps.setString(counter++, checkOut);
+
+            ps.setString(counter++, checkIn);
+            ps.setString(counter++, checkOut);
+
+            //Query 3 - match dates
+            ps.setString(counter++, checkIn);
+            ps.setString(counter++, checkOut);
+
+            ps.setInt(counter++, totalPeople);
+
+            ps.setString(counter++, checkIn);
+            ps.setString(counter++, checkOut);
+
+            ps.setString(counter++, checkIn);
+            ps.setString(counter++, checkOut);
+
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+               String rc = rs.getString("RoomCode");
+               String rn = rs.getString("RoomName");
+               String bt = rs.getString("BedType");
+               float rate = rs.getFloat("BasePrice");
+               String cn = rs.getString("CheckIn");
+               String co = rs.getString("CheckOut");
+               Reservation r = new Reservation(rc, rn, bt, cn, co, numAdults, numChildren, rate);
+               ls.add(r);
+            }
+         }
+      }
+      return ls;
+   }
 	private List<Reservation> exactSuggestions(String roomCode, String bedType,
                                  String checkIn, String checkOut,
                                  int numChildren, int numAdults) throws SQLException {
