@@ -192,15 +192,7 @@ public class InnReservations {
             try (Connection conn = DriverManager.getConnection(System.getenv("LAB6_JDBC_URL"),
                                    System.getenv("LAB6_JDBC_USER"),
                                    System.getenv("LAB6_JDBC_PW"))) {
-<<<<<<< HEAD
-               try(Statement st = conn.createStatement();
-                  ResultSet rs = st.executeQuery(maxCode)) {
-                  while(rs.next()) {
-                     maxCd = rs.getInt("Code");
-                  }
-               }
-=======
->>>>>>> 13b5e4661bc34d48927824b89d2e85e81efd98cb
+
                try(PreparedStatement ps = conn.prepareStatement(insert)) {
                   ps.setInt(counter++, (maxCd + 1)); // NEEDS A UNIQUE ID
                   ps.setString(counter++, res.getRoomCode());
