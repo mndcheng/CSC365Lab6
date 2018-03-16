@@ -12,9 +12,9 @@ export IR_JDBC_USER=qnngo
 export IR_JDBC_PW=...
 
 export CLASSPATH=$CLASSPATH:mysql-connector-java-5.1.45-bin.jar:.ls
-export LAB6_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/acheng21?autoReconnect=true\&useSSL=false
-export LAB6_JDBC_USER=acheng21
-export LAB6_JDBC_PW=365W18_011282748
+export IR_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/acheng21?autoReconnect=true\&useSSL=false
+export IR_JDBC_USER=acheng21
+export IR_JDBC_PW=365W18_011282748
  */
 
 public class InnReservations {
@@ -62,33 +62,33 @@ public class InnReservations {
     }
 	
    private void roomsAndRates() throws SQLException{
-     String bigSelect = "select tmp1.Popularity, tmp1.Room, tmp2.Next_Avail, " +
-                     "tmp3.Last_CheckOut, tmp3.Last_Stay from (select round(sum(" +
-                     "CASE WHEN Date_Sub(CurDate(), Interval 180 DAY) between CheckIn and CheckOut " +
-                     "Then datediff(CheckOut, Date_Sub(CurDate(), Interval 180 DAY)) " +
-                     "WHEN CheckIn between Date_Sub(CurDate(), Interval 180 DAY) and CurDate() " +
-                     "Then datediff(CheckOut, CheckIn) " +
-                     "WHEN CurDate() between CheckIn and CheckOut " +
-                     "Then datediff(CurDate(), CheckIn) " +
-                     "Else 0 End)/180, 2) as Popularity, " +
-                     "Room from lab6_reservations group by room) tmp1 " +
-                     "left join (select Room, Min(CheckOut) as Next_Avail from lab6_reservations " +
-                     "where CheckOut > CurDate() " +
-                     "AND CurDate() between CheckIn and CheckOut " +
-                     "group by room " +
-                     "UNION distinct " +
-                     "select Room, CurDate() as Next_avail " +
-                     "from lab6_reservations " +
-                     "where Room not in ( " +
-                     "select Room from lab6_reservations where CurDate() between CheckIn and CheckOut)" +
-                     ") tmp2 on tmp1.Room = tmp2.Room " +
-                     "left join ( " +
-                     "select Room, CheckOut as Last_CheckOut, datediff(CheckOut, CheckIn) as Last_Stay "+
-                     "from lab6_reservations t1 where (Room, CheckOut) = ANY (" +
-                     "select Room, max(CheckOut) from lab6_reservations " +
-                     "where CheckOut < CurDate() " +
-                     "group by Room) " +
-                     ") tmp3 on tmp2.Room = tmp3.Room;";
+     String bigSelect = "SELECT tmp1.Popularity, tmp1.Room, tmp2.Next_Avail, " +
+                     "tmp3.Last_CheckOut, tmp3.Last_Stay FROM (SELECT ROUND(SUM(" +
+                     "CASE WHEN Date_Sub(CurDate(), Interval 180 DAY) BETWEEN CheckIn AND CheckOut " +
+                     "THEN DATEDIFF(CheckOut, Date_Sub(CurDate(), Interval 180 DAY)) " +
+                     "WHEN CheckIn BETWEEN Date_Sub(CurDate(), Interval 180 DAY) AND CurDate() " +
+                     "THEN datediff(CheckOut, CheckIn) " +
+                     "WHEN CurDate() BETWEEN CheckIn AND CheckOut " +
+                     "THEN DATEDIFF(CurDate(), CheckIn) " +
+                     "ELSE 0 END)/180, 2) AS Popularity, " +
+                     "Room FROM lab6_reservations GROUP BY room) tmp1 " +
+                     "LEFT JOIN (SELECT Room, MIN(CheckOut) AS Next_Avail FROM lab6_reservations " +
+                     "WHERE CheckOut > CurDate() " +
+                     "AND CurDate() BETWEEN CheckIn AND CheckOut " +
+                     "GROUP BY room " +
+                     "UNION DISTINCT " +
+                     "SELECT Room, CurDate() AS Next_avail " +
+                     "FROM lab6_reservations " +
+                     "WHERE Room NOT IN ( " +
+                     "SELECT Room FROM lab6_reservations WHERE CurDate() BETWEEN CheckIn AND CheckOut)" +
+                     ") tmp2 ON tmp1.Room = tmp2.Room " +
+                     "LEFT JOIN ( " +
+                     "SELECT Room, CheckOut AS Last_CheckOut, DATEDIFF(CheckOut, CheckIn) AS Last_Stay "+
+                     "FROM lab6_reservations t1 WHERE (Room, CheckOut) = ANY (" +
+                     "SELECT Room, MAX(CheckOut) FROM lab6_reservations " +
+                     "WHERE CheckOut < CurDate() " +
+                     "GROUP BY Room) " +
+                     ") tmp3 ON tmp2.Room = tmp3.Room;";
       DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
       try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
                                 System.getenv("IR_JDBC_USER"),
@@ -294,9 +294,9 @@ public class InnReservations {
     private void reservationInfo() throws SQLException {
 
 		// Step 1: Establish connection to RDBMS
-		try (Connection conn = DriverManager.getConnection(System.getenv("LAB6_JDBC_URL"),
-									System.getenv("LAB6_JDBC_USER"),
-									System.getenv("LAB6_JDBC_PW"))) {
+		try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
+									System.getenv("IR_JDBC_USER"),
+									System.getenv("IR_JDBC_PW"))) {
 			// Step 2: Construct SQL statement
 			Search s = getSearch(); 
 			String selectSql = "SELECT CODE, Room, RoomName, CheckIn, " +
@@ -395,9 +395,9 @@ public class InnReservations {
     private void revenue() throws SQLException {
 
 		// Step 1: Establish connection to RDBMS
-		try (Connection conn = DriverManager.getConnection(System.getenv("LAB6_JDBC_URL"),
-									System.getenv("LAB6_JDBC_USER"),
-									System.getenv("LAB6_JDBC_PW"))) {
+		try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
+									System.getenv("IR_JDBC_USER"),
+									System.getenv("IR_JDBC_PW"))) {
 			// Step 2: Construct SQL statement
 
 			String dropTable = "DROP VIEW IF EXISTS Revenue;";
@@ -564,18 +564,6 @@ public class InnReservations {
 							"\n reservation code: " + reservationCode + "\n"); 
 		}
 
-		public int getFn() { return fn; }
-
-		public int getLn() { return ln; }
-
-		public int getD1() { return d1; }
-
-		public int getD2() { return d2; }
-
-		public int getRmC() { return rmC; }
-
-		public int getRsC() { return rsC; }
-
 		public String getFirstName() { return firstName; }
 
 		public String getLastName() { return lastName; }
@@ -587,22 +575,6 @@ public class InnReservations {
 		public String getRoomCode() { return roomCode; }
 
 		public String getResCode() { return reservationCode; }
-
-		public void setField(int newField) {
-			if (newField == FN) {
-				fn = newField;
-			} else if (newField == LN) {
-				ln = newField;
-			} else if (newField == D1) {
-				d1 = newField;
-			} else if (newField == D2) {
-				d2 = newField; 
-			} else if (newField == RMC) {
-				rmC = newField; 
-			} else if (newField == RSC) {
-				rsC = newField;
-			}
-		}
 
 		public void setEntry(int entry, String newEntry) { 
 			if (entry == FN) {
