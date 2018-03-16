@@ -379,6 +379,7 @@ private float calcCost(float rate, String checkIn, String checkOut) {
 					}
 					System.out.println(""); 
 				}
+				System.out.println("");
 
 				// Step 6: Commit or rollback transaction
 				conn.commit();
