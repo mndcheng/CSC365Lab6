@@ -113,7 +113,181 @@ public class InnReservations {
          }
       }
    }
-   
+   private void reservations() {
+      Scanner scan = new Scanner(System.in);
+      System.out.println("Enter first name for reservation: ");
+      String firstName = scan.nextLine();
+
+      System.out.println("Enter last name for reservation: ");
+      String lastName = scan.nextLine();
+
+      System.out.println("Enter room code or \"any\" if no preference: ");
+      String roomCode = scan.nextLine();
+
+      System.out.println("Enter preferred bedtype or \"any\" if no preference: ");
+      String bedType = scan.nextLine();
+
+      System.out.println("Enter desired check-in date: ");
+      String checkIn = scan.nextLine();
+
+      System.out.println("Enter desired check-out date: ");
+      String checkOut = scan.nextLine();
+
+      System.out.println("Enter number of children: ");
+      String children = scan.nextLine();
+      int numChildren = Integer.parseInt(children);
+
+      System.out.println("Enter number of adults: ");
+      String adults = scan.nextLine();
+      int numAdults = Integer.parseInt(adults);
+
+      if((numChildren + numAdults) > 4) {
+         System.out.println("Too many occupants for any room\n");
+      } else {
+         try {
+            suggestions(firstName, lastName, roomCode, bedType, checkIn, checkOut, numChildren, numAdults);
+         }
+         catch(SQLException e) {}
+      }
+   }
+	
+   private void suggestions(String firstName, String lastName, String roomCode, String bedType,
+                           String checkIn, String checkOut,
+                           int numChildren, int numAdults) throws SQLException {
+
+      List<Reservation> exactMatches = exactSuggestions(roomCode, bedType, checkIn,
+                                                checkOut, numChildren, numAdults);
+      Reservation res;
+
+      Scanner scan = new Scanner(System.in);
+
+      String insert = "Insert Into lab6_reservations ?, ?, ?, ?, ?, ?, ?, ?";
+      if(exactMatches.size() > 0) {
+         int i = 1, counter = 1;
+         System.out.println("Exact Matches Found: ");
+         for(Reservation r : exactMatches) {
+            System.out.printf("%-3d %s\n", i++, r.getRoomCode());
+         }
+
+         System.out.println("Select a number: ");
+         String resp = scan.nextLine();
+         int selection = Integer.parseInt(resp);
+         res = exactMatches.get(selection - 1);
+
+         float total = calcCost(res.getRate(), checkIn, checkOut);
+
+         System.out.println("Reservation Info:");
+         System.out.printf("First Name: %s\n", firstName);
+         System.out.printf("Last Name: %s\n", lastName);
+
+         printReservation(res, total);
+
+         System.out.println("confirm or cancel");
+         String confirm = scan.nextLine();
+
+         if(confirm.equals("confirm")) {
+            try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
+                                   System.getenv("IR_JDBC_USER"),
+                                   System.getenv("IR_JDBC_PW"))) {
+               try(PreparedStatement ps = conn.prepareStatement(insert)) {
+                  ps.setInt(counter++, 100011);
+                  ps.setString(counter++, res.getRoomCode());
+                  ps.setString(counter++, res.getCheckIn());
+                  ps.setString(counter++, res.getCheckOut());
+                  ps.setFloat(counter++, total);
+                  ps.setString(counter++, lastName);
+                  ps.setString(counter++, firstName);
+                  ps.setInt(counter++, res.getNumAdults());
+                  ps.setInt(counter++, res.getNumChildren());
+               }
+            }
+         }
+      }
+private void printReservation(Reservation res, float total) {
+    System.out.printf("Room Code: %s\n", res.getRoomCode());
+    System.out.printf("Room Name: %s\n", res.getRoomName());
+    System.out.printf("Bed Type: %s\n", res.getBedType());
+    System.out.printf("Check In Date: %s\n", res.getCheckIn());
+    System.out.printf("Check Out Date: %s\n", res.getCheckOut());
+    System.out.printf("Number of Children: %d\n", res.getNumChildren());
+    System.out.printf("Number of Adults: %d\n", res.getNumAdults());
+    System.out.printf("Total Cost: %.2f\n", total);
+}
+
+private float calcCost(float rate, String checkIn, String checkOut) {
+    int numWeekdays = 0, numWeekends = 0;
+    LocalDate cko, ckin;
+    cko = LocalDate.parse(checkOut);
+    ckin = LocalDate.parse(checkIn);
+    while(!ckin.equals(cko)) {
+    if(ckin.getDayOfWeek() == DayOfWeek.SUNDAY || ckin.getDayOfWeek() == DayOfWeek.SATURDAY)
+        numWeekends++;
+    else
+        numWeekdays++;
+     ckin = ckin.plusDays(1);
+    }
+    return (float)(rate*numWeekdays) + (float)(rate*1.1*numWeekends);
+}
+
+
+	
+	      
+	private List<Reservation> exactSuggestions(String roomCode, String bedType,
+                                 String checkIn, String checkOut,
+                                 int numChildren, int numAdults) throws SQLException {
+
+      List<Reservation> ls = new ArrayList<Reservation>();
+      String sqlSelect = "Select RoomCode, RoomName, BedType, BasePrice from lab6_rooms where ";
+      int counter = 1;
+
+      if(!roomCode.equals("any")) {
+         sqlSelect = sqlSelect + "RoomCode = ? AND ";
+      }
+
+      if(!bedType.equals("any")) {
+         sqlSelect = sqlSelect + "bedType = ? AND ";
+      }
+
+      sqlSelect = sqlSelect + "maxOcc > ? AND " +
+                        "RoomCode NOT IN (Select Room from lab6_reservations " +
+                        "where CheckIn between ? " +
+                        "and ? OR CheckOut " +
+                        "between ? and ?);";
+      try (Connection conn = DriverManager.getConnection(System.getenv("IR_JDBC_URL"),
+                                System.getenv("IR_JDBC_USER"),
+                                System.getenv("IR_JDBC_PW"))) {
+         try(PreparedStatement ps = conn.prepareStatement(sqlSelect)) {
+            if(!roomCode.equals("any")) {
+               ps.setString(counter++, roomCode);
+            }
+
+            if(!bedType.equals("any")) {
+               ps.setString(counter++, bedType);
+            }
+
+            int totalPeople = numChildren + numAdults;
+            ps.setInt(counter++, totalPeople);
+
+            ps.setString(counter++, checkIn);
+            ps.setString(counter++, checkOut);
+
+            ps.setString(counter++, checkIn);
+            ps.setString(counter++, checkOut);
+
+            ResultSet rs = ps.executeQuery();
+            while(rs.next()) {
+               String rc = rs.getString("RoomCode");
+               String rn = rs.getString("RoomName");
+               String bt = rs.getString("BedType");
+               float rate = rs.getFloat("BasePrice");
+               Reservation r = new Reservation(rc, rn, bt, checkIn, checkOut, numAdults, numChildren, rate);
+               ls.add(r);
+            }
+         }
+      }
+      return ls;
+   }
+
     // Detailed Reservation Information   
     private void reservationInfo() throws SQLException {
 
@@ -444,5 +618,35 @@ public class InnReservations {
 		}
 
 	}
+       
+    private class Reservation {
+      private String roomCode, roomName, bedType, checkIn, checkOut;
+      private int numAdults, numChildren;
+      private float rate;
+
+      public Reservation(String roomCode, String roomName,
+                        String bedType, String checkIn, String checkOut,
+                        int numAdults, int numChildren, float rate) {
+         this.roomCode = roomCode;
+         this.roomName = roomName;
+         this.bedType = bedType;
+         this.checkIn = checkIn;
+         this.checkOut = checkOut;
+         this.numAdults = numAdults;
+         this.numChildren = numChildren;
+         this.rate = rate;
+      }
+
+      public String getRoomCode() {return this.roomCode;}
+      public String getRoomName() {return this.roomName;}
+      public String getBedType() {return this.bedType;}
+      public String getCheckIn() {return this.checkIn;}
+      public String getCheckOut() {return this.checkOut;}
+      public int getNumAdults() {return this.numAdults;}
+      public int getNumChildren() {return this.numChildren;}
+      public float getRate() {return this.rate;}
+   }
+}
+
 
 }
