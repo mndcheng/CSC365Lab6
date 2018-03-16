@@ -10,12 +10,7 @@ export CLASSPATH=$CLASSPATH:mysql-connector-java-5.1.44-bin.jar:.
 <<<<<<< HEAD
 export IR_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/qnngo?autoReconnect=true\&useSSL=false
 export IR_JDBC_USER=qnngo
-export IR_JDBC_PW=
-=======
-export LAB6_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/qnngo?autoReconnect=true\&useSSL=false
-export LAB6_JDBC_USER=qnngo
-export LAB6_JDBC_PW=...
->>>>>>> 13b5e4661bc34d48927824b89d2e85e81efd98cb
+export IR_JDBC_PW=...
 
 export CLASSPATH=$CLASSPATH:mysql-connector-java-5.1.45-bin.jar:.ls
 export LAB6_JDBC_URL=jdbc:mysql://csc365winter2018.webredirect.org/acheng21?autoReconnect=true\&useSSL=false
