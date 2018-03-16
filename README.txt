@@ -13,3 +13,4 @@ Amanda Cheng
 4. Run program
 
 /*-------Known Bugs-------*/
+Currently, we have no known bugs. 
