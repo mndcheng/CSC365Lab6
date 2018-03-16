@@ -191,7 +191,7 @@ public class InnReservations {
                                    System.getenv("IR_JDBC_USER"),
                                    System.getenv("IR_JDBC_PW"))) {
                try(PreparedStatement ps = conn.prepareStatement(insert)) {
-                  ps.setInt(counter++, 100011);
+                  ps.setInt(counter++, ); // NEEDS A UNIQUE ID
                   ps.setString(counter++, res.getRoomCode());
                   ps.setString(counter++, res.getCheckIn());
                   ps.setString(counter++, res.getCheckOut());
@@ -204,36 +204,36 @@ public class InnReservations {
             }
          }
       }
+      else {
+         
+      }
    }
-private void printReservation(Reservation res, float total) {
-    System.out.printf("Room Code: %s\n", res.getRoomCode());
-    System.out.printf("Room Name: %s\n", res.getRoomName());
-    System.out.printf("Bed Type: %s\n", res.getBedType());
-    System.out.printf("Check In Date: %s\n", res.getCheckIn());
-    System.out.printf("Check Out Date: %s\n", res.getCheckOut());
-    System.out.printf("Number of Children: %d\n", res.getNumChildren());
-    System.out.printf("Number of Adults: %d\n", res.getNumAdults());
-    System.out.printf("Total Cost: %.2f\n", total);
-}
+   private void printReservation(Reservation res, float total) {
+      System.out.printf("Room Code: %s\n", res.getRoomCode());
+      System.out.printf("Room Name: %s\n", res.getRoomName());
+      System.out.printf("Bed Type: %s\n", res.getBedType());
+      System.out.printf("Check In Date: %s\n", res.getCheckIn());
+      System.out.printf("Check Out Date: %s\n", res.getCheckOut());
+      System.out.printf("Number of Children: %d\n", res.getNumChildren());
+      System.out.printf("Number of Adults: %d\n", res.getNumAdults());
+      System.out.printf("Total Cost: %.2f\n", total);
+   }
 
-private float calcCost(float rate, String checkIn, String checkOut) {
+   private float calcCost(float rate, String checkIn, String checkOut) {
     int numWeekdays = 0, numWeekends = 0;
     LocalDate cko, ckin;
     cko = LocalDate.parse(checkOut);
     ckin = LocalDate.parse(checkIn);
     while(!ckin.equals(cko)) {
-    if(ckin.getDayOfWeek() == DayOfWeek.SUNDAY || ckin.getDayOfWeek() == DayOfWeek.SATURDAY)
-        numWeekends++;
-    else
-        numWeekdays++;
-     ckin = ckin.plusDays(1);
-    }
-    return (float)(rate*numWeekdays) + (float)(rate*1.1*numWeekends);
-}
-
-
-	
-	      
+      if(ckin.getDayOfWeek() == DayOfWeek.SUNDAY || ckin.getDayOfWeek() == DayOfWeek.SATURDAY)
+         numWeekends++;
+      else
+         numWeekdays++;
+      ckin = ckin.plusDays(1);
+      }
+      return (float)(rate*numWeekdays) + (float)(rate*1.1*numWeekends);
+   }
+      
 	private List<Reservation> exactSuggestions(String roomCode, String bedType,
                                  String checkIn, String checkOut,
                                  int numChildren, int numAdults) throws SQLException {
@@ -250,7 +250,7 @@ private float calcCost(float rate, String checkIn, String checkOut) {
          sqlSelect = sqlSelect + "bedType = ? AND ";
       }
 
-      sqlSelect = sqlSelect + "maxOcc > ? AND " +
+      sqlSelect = sqlSelect + "maxOcc >= ? AND " +
                         "RoomCode NOT IN (Select Room from lab6_reservations " +
                         "where CheckIn between ? " +
                         "and ? OR CheckOut " +
