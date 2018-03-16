@@ -537,16 +537,9 @@ public class InnReservations {
 	}
 
 	private class Search {
-		int fn, ln, d1, d2, rmC, rsC;
 		String firstName, lastName, date1, date2, roomCode, reservationCode; 
 
 		public Search() {
-			this.fn = fn;
-			this.ln = ln;
-			this.d1 = d1;
-			this.d2 = d2;
-			this.rmC = rmC;
-			this.rsC = rsC;
 			this.firstName = "%";
 			this.lastName = "%"; 
 			this.date1 = null;
@@ -555,27 +548,12 @@ public class InnReservations {
 			this.reservationCode = "%";
 		}
 
-		public void printValues() {
-			System.out.println("first name: " + firstName);
-			System.out.println("last name: " + lastName);
-			System.out.print("checkIn: " + date1 +
-							"\n checkout: " + date2 + 
-							"\n room code: " + roomCode + 
-							"\n reservation code: " + reservationCode + "\n"); 
-		}
-
 		public String getFirstName() { return firstName; }
-
 		public String getLastName() { return lastName; }
-
 		public String getDate1() { return date1; }
-
 		public String getDate2() { return date2; }
-
 		public String getRoomCode() { return roomCode; }
-
 		public String getResCode() { return reservationCode; }
-
 		public void setEntry(int entry, String newEntry) { 
 			if (entry == FN) {
 				firstName = newEntry;
